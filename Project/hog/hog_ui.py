@@ -125,7 +125,7 @@ def run(*args):
     """Select number of players and play a game."""
     import argparse
     parser = argparse.ArgumentParser(description="Play Hog")
-    parser.add_argument('--num_players', '-n', type=int, default=0,
+    parser.add_argument('--num_players', '-n', type=int, default=1,
                         help='How many interactive players (0, 1, or 2)')
     args = parser.parse_args()
     play_with(args.num_players)

@@ -25,6 +25,12 @@ def num_eights(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n == 8:
+        return 1
+    elif n >= 10:
+        return num_eights(n // 10) + (n % 10 == 8)
+    else:
+        return 0
 
 
 def digit_distance(n):
@@ -47,6 +53,10 @@ def digit_distance(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 0
+    else:
+        return abs(n % 10 - n % 100 // 10) + digit_distance(n // 10)
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -72,6 +82,16 @@ def interleaved_sum(n, odd_func, even_func):
     """
     "*** YOUR CODE HERE ***"
 
+    def sum_from(k):
+        if k > n:
+            return 0
+        elif k == n:
+            return odd_func(k)
+        else:
+            return odd_func(k) + even_func(k + 1) + sum_from(k + 2)
+
+    return sum_from(1)
+
 
 def next_smaller_dollar(bill):
     """Returns the next smaller bill in order."""
@@ -85,6 +105,7 @@ def next_smaller_dollar(bill):
         return 5
     elif bill == 5:
         return 1
+
 
 def count_dollars(total):
     """Return the number of ways to make change.
@@ -108,6 +129,19 @@ def count_dollars(total):
     """
     "*** YOUR CODE HERE ***"
 
+    def constrained_count(total, largest_bill):
+        if total == 0:
+            return 1
+        elif total < 0:
+            return 0
+        if largest_bill is None:
+            return 0
+        without_dollar_bill = constrained_count(total, next_smaller_dollar(largest_bill))
+        with_dollar_bill = constrained_count(total - largest_bill, largest_bill)
+        return without_dollar_bill + with_dollar_bill
+
+    return constrained_count(total, 100)
+
 
 def next_larger_dollar(bill):
     """Returns the next larger bill in order."""
@@ -121,6 +155,7 @@ def next_larger_dollar(bill):
         return 50
     elif bill == 50:
         return 100
+
 
 def count_dollars_upward(total):
     """Return the number of ways to make change using bills.
@@ -144,10 +179,24 @@ def count_dollars_upward(total):
     """
     "*** YOUR CODE HERE ***"
 
+    def constrained_count(total, smallest):
+        if total == 0:
+            return 1
+        elif total < 0:
+            return 0
+        elif smallest is None:
+            return 0
+        with_small = constrained_count(total - smallest, smallest)
+        without_small = constrained_count(total, next_larger_dollar(smallest))
+        return with_small + without_small
+
+    return constrained_count(total, 1)
+
 
 def print_move(origin, destination):
     """Print instructions to move a disk."""
     print("Move the top disk from rod", origin, "to rod", destination)
+
 
 def move_stack(n, start, end):
     """Print the moves required to move n disks on the start pole to the end
@@ -155,7 +204,7 @@ def move_stack(n, start, end):
 
     n -- number of disks
     start -- a pole position, either 1, 2, or 3
-    end -- a pole position, either 1, 2, or 3
+    end -- a pole position, either 1, 2, or 3    3 0 0
 
     There are exactly three poles, and start and end must be different. Assume
     that the start pole has at least n disks of increasing size, and the end
@@ -178,9 +227,17 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+    else:
+        other = 6 - start - end
+        move_stack(n - 1, start, other)
+        move_stack(1, start, end)
+        move_stack(n - 1, other, end)
 
 
 from operator import sub, mul
+
 
 def make_anonymous_factorial():
     """Return the value of an expression that computes factorial.
@@ -193,5 +250,4 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
-
+    return (lambda f: lambda k: f(f, k))(lambda f,k: k if k == 1 else mul(k,f(f,sub(k,1))))
